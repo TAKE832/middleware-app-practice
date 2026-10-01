@@ -1,67 +1,25 @@
-# Laravel Middleware Starter
+## 概要
 
-ミドルウェアハンズオン（10-2-4）用のスターターキットです。
+COACHTECH 教材 Tutorial 10-2「ミドルウェア ハンズオン演習」で作成した成果物です。
+（adminを持つユーザーのみページにアクセス可能にするミドルウェアを実装しました。）
 
-## 含まれているもの
+## 使用技術
 
-- Laravel 10.x + Sail
-- Fortify認証（ログイン / 登録 / ログアウト）
-- Userモデル（is_adminカラム付き）
-- テストユーザー（シーダー）
-  - 管理者: admin@example.com / password
-  - 一般: user@example.com / password
-- AdminController
-- 管理者ページ（/admin）
+- PHP 8.x
+- Laravel 10.x
+- カスタムミドルウェア
+- Laravel Fortify（認証）
 
-## セットアップ
+## 学んだこと
 
-```bash
-# クローン
-git clone https://github.com/coachtech-material/laravel-middleware-starter.git middleware-app-sample
-cd laravel-middleware-starter
+- sail artisan make:middleware コマンドを使って、カスタムミドルウェアを作成できることが分かった。その後、Kernel.php の $middlewareAliases に登録し、routes/web.php でルートを明記することで、特定のルートのみに適用することができることも分かった。
+- ミドルウェアはユーザーからのリクエストをグローバルミドルウェア→ミドルウェアグループ→ルートミドルウェアの順で処理を行い、レスポンスの際は逆方向に返していくことが分かった。
+- HTTPリクエストがLaravelに到達してから、レスポンスが返されるまでの流れをHTTPライフサイクルということが分かった。また、その流れを理解しておくことで、デバッグをする際に、問題箇所を絞り込るため、開発の効率を上げるために必要な知識だということも理解できた。
 
-# 依存関係インストール
-docker run --rm \
-  -u "$(id -u):$(id -g)" \
-  -v "$(pwd):/var/www/html" \
-  -w /var/www/html \
-  -e COMPOSER_CACHE_DIR=/tmp/composer_cache \
-  laravelsail/php82-composer:latest \
-  composer install
+## 詰まったポイントと解決方法
 
-# 環境ファイル作成
-cp .env.example .env
-
-# Sail起動
-./vendor/bin/sail up -d
-
-# アプリケーションキー生成
-./vendor/bin/sail artisan key:generate
-
-# マイグレーション・シーダー実行
-./vendor/bin/sail artisan migrate --seed
-```
+- 管理者でないユーザーに対し、403エラーを発生させることが最初はできなかった。webで403エラーを発生させる方法を調べて、検索結果をhandleに落とし込み、エラーとエラー文を発生させることができた。
 
 ## 動作確認
 
-1. http://localhost にアクセス
-2. admin@example.com / password でログイン
-3. 「管理者ページにアクセス」をクリック → 表示される
-4. ログアウトして user@example.com / password でログイン
-5. 「管理者ページにアクセス」をクリック → 表示される（ミドルウェア未実装のため）
-
-## 演習課題
-
-カスタムミドルウェアを作成して、管理者のみが /admin にアクセスできるようにしてください。
-
-## 実装タスク
-
-1. CheckAdminミドルウェアを作成
-2. handleメソッドに管理者チェックロジックを実装
-3. Kernel.phpにミドルウェアを登録
-4. /adminルートにミドルウェアを適用
-
-## 完成後の動作
-
-- admin@example.com でログイン → /admin アクセス → ✅ 表示される
-- user@example.com でログイン → /admin アクセス → ❌ 403エラー
+（http://localhost） にアクセスし、各ユーザーでログインをする。その後、管理者ページにアクセスをした際、管理者側はページの表示、管理者でない側は、403エラーとエラー文が発生することを確認した。
